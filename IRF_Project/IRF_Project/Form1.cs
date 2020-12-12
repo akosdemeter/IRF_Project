@@ -36,10 +36,11 @@ namespace IRF_Project
             SimulateMatches();
             dataGridView2.DataSource = gameResults;
             RankTeams();
-            dataGridView3.DataSource = leagueResults; /* (from z in leagueResults 
+            dataGridView3.DataSource =  (from z in leagueResults 
                                         select z).OrderByDescending(c => 
-                                        c.totalpoints).OrderByDescending(d => 
-                                        d.totalgoalsscored).OrderByDescending(e => e.totalgoalsget);*/
+                                        c.totalpoints).ThenByDescending(d => 
+                                        d.totalgoaldifference).ThenByDescending(e => 
+                                        e.totalgoalsscored).ToList();
         }
 
         private void LoadData() {
@@ -176,6 +177,7 @@ namespace IRF_Project
                 leagueResult.totalpoints = allhomepoints + allawaypoints;
                 leagueResult.totalgoalsscored = allhomegoals + allawaygoals;
                 leagueResult.totalgoalsget = allhomegoalsget + allawaygoalsget;
+                leagueResult.totalgoaldifference = (leagueResult.totalgoalsscored) - (leagueResult.totalgoalsget);
                 leagueResults.Add(leagueResult);
             }
         }

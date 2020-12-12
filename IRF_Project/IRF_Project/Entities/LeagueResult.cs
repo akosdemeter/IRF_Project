@@ -10,6 +10,7 @@ namespace IRF_Project.Entities
     {
         public string teamname { get; set; }
         public int totalpoints { get; set; }
+        public int totalgoaldifference { get; set; }
         public int totalgoalsscored { get; set; }
         public int totalgoalsget { get; set; }
     }
