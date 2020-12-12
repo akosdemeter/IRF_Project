@@ -74,6 +74,15 @@ namespace IRF_Project
                                                   select x.MIDFIELD_LEVEL).First();
                         currentawaygoal = GetGoalsScored(currentattack, currentmidfield,
                             currentdefense, currentgoalkeeper);
+                        //Mérkőzések rögzítése
+                        GameResult gameResult = new GameResult();
+                        gameResult.HomeTeamID = i + 1;
+                        gameResult.AwayTeamID = j + 1;
+                        gameResult.HomeTeamGoals = currenthomegoal;
+                        gameResult.AwayTeamGoals = currentawaygoal;
+                        gameResult.HomeTeamPoints = GetPointsEarned(currenthomegoal, currentawaygoal);
+                        gameResult.AwayTeamPoints = GetPointsEarned(currentawaygoal, currenthomegoal);
+                        gameResults.Add(gameResult);
                     }
                 }
             }
@@ -102,6 +111,25 @@ namespace IRF_Project
             return goalsscored;
         }
 
-
+        //a gólok alapján kiszámolja a csapat pontjait
+        private int GetPointsEarned(int goalsscored, int goalsgot) {
+            int points;
+            if (goalsscored > goalsgot)
+            {
+                points = 3;
+            }
+            else
+            {
+                if (goalsscored == goalsgot)
+                {
+                    points = 1;
+                }
+                else
+                {
+                    points = 0;
+                }
+            }
+            return points;
+        }
     }
 }

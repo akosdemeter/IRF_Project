@@ -8,11 +8,11 @@ namespace IRF_Project.Entities
 {
     public class GameResult
     {
-        int HomeTeamID { get; set; }
-        int AwayTeamID { get; set; }
-        int HomeTeamGoals { get; set; }
-        int AwayTeamGoals { get; set; }
-        int HomeTeamPoints { get; set; }
-        int AwayTeamPoints { get; set; }
+        public int HomeTeamID { get; set; }
+        public int AwayTeamID { get; set; }
+        public int HomeTeamGoals { get; set; }
+        public int AwayTeamGoals { get; set; }
+        public int HomeTeamPoints { get; set; }
+        public int AwayTeamPoints { get; set; }
     }
 }
