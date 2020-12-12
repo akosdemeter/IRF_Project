@@ -18,7 +18,7 @@ namespace IRF_Project
         List<TEAM> TEAMs;
         List<GameResult> gameResults = new List<GameResult>();
         List<LeagueResult> leagueResults = new List<LeagueResult>();
-        Random rng = new Random(); //a seed megadása nem biztos, hogy fog kelleni
+        Random rng = new Random();
         int currenthomegoal = 0;
         int currentawaygoal = 0;
         int currentattack;
@@ -34,14 +34,6 @@ namespace IRF_Project
             InitializeComponent();
             LoadData();
             dataGridView1.DataSource = TEAMs;
-            SimulateMatches();
-            dataGridView2.DataSource = gameResults;
-            RankTeams();
-            dataGridView3.DataSource =  (from z in leagueResults 
-                                        select z).OrderByDescending(c => 
-                                        c.totalpoints).ThenByDescending(d => 
-                                        d.totalgoaldifference).ThenByDescending(e => 
-                                        e.totalgoalsscored).ToList();
         }
 
         private void LoadData() {
@@ -183,9 +175,59 @@ namespace IRF_Project
             }
         }
 
+        private void btnSimulation_Click(object sender, EventArgs e)
+        {
+            SimulateMatches();
+            dataGridView2.DataSource = gameResults;
+            RankTeams();
+            dataGridView3.DataSource = (from z in leagueResults
+                                        orderby z.totalpoints descending,
+                                         z.totalgoaldifference descending,
+                                         z.totalgoalsscored descending
+                                        select z).ToList();
+        }
+
         //Eredmények kiíratása csv fileba
-        private void OutputToCSV() {
-            //StreamWriter sw = new StreamWriter("",Encoding.Default);
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            if (leagueResults.Count!=0)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.InitialDirectory = Application.StartupPath;
+                sfd.Filter = "Comma Separated Values (*.csv)|*.csv";
+                sfd.DefaultExt = "csv";
+                sfd.AddExtension = true;
+                if (sfd.ShowDialog() != DialogResult.OK) return;
+                using (StreamWriter sw = new StreamWriter(sfd.FileName, false, Encoding.UTF8))
+                {
+                    int rank = 1;
+                    sw.Write("Helyezés,Csapatnév,Pontszám,Gólkülönbség,Rúgott gólok száma,Kapott gólok száma");
+                    sw.WriteLine();
+                    var orderedResults = (from z in leagueResults
+                                          orderby z.totalpoints descending,
+                                          z.totalgoaldifference descending,
+                                          z.totalgoalsscored descending
+                                          select z).ToList();
+                    foreach (var row in orderedResults)
+                    {
+                        sw.Write(rank);
+                        sw.Write(",");
+                        sw.Write(row.teamname);
+                        sw.Write(",");
+                        sw.Write(row.totalpoints);
+                        sw.Write(",");
+                        sw.Write(row.totalgoaldifference);
+                        sw.Write(",");
+                        sw.Write(row.totalgoalsscored);
+                        sw.Write(",");
+                        sw.Write(row.totalgoalsget);
+                        sw.Write(",");
+                        sw.WriteLine();
+                        rank = rank + 1;
+                    }
+                }
+            }
+            
         }
     }
 }
