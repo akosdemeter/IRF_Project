@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IRF_Project.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,6 +15,7 @@ namespace IRF_Project
     {
         IRF_assignmentEntities context = new IRF_assignmentEntities();
         List<TEAM> TEAMs;
+        List<GameResult> gameResults = new List<GameResult>();
         public Form1()
         {
             InitializeComponent();
@@ -23,5 +25,6 @@ namespace IRF_Project
         private void LoadData() {
             TEAMs = context.TEAMS.ToList();
         }
+        
     }
 }
