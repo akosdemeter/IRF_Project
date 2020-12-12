@@ -17,6 +17,12 @@ namespace IRF_Project
         List<TEAM> TEAMs;
         List<GameResult> gameResults = new List<GameResult>();
         Random rng = new Random(1234); //a seed megadása nem biztos, hogy fog kelleni
+        int currenthomegoal = 0;
+        int currentawaygoal = 0;
+        int currentattack;
+        int currentmidfield;
+        int currentdefense;
+        int currentgoalkeeper;
 
         public Form1()
         {
@@ -38,14 +44,43 @@ namespace IRF_Project
                 {
                     if (i!=j)
                     {
-                        
+                        //Hazai csapat góljainak a száma
+                        currentattack = (int)(from x in TEAMs 
+                                              where x.ID == i + 1 
+                                              select x.ATTACK_LEVEL).First();
+                        currentmidfield = (int)(from x in TEAMs
+                                                where x.ID == i + 1
+                                                select x.MIDFIELD_LEVEL).First();
+                        currentdefense = (int)(from x in TEAMs
+                                                where x.ID == j + 1
+                                                select x.MIDFIELD_LEVEL).First();
+                        currentgoalkeeper = (int)(from x in TEAMs
+                                                where x.ID == j + 1
+                                                select x.MIDFIELD_LEVEL).First();
+                        currenthomegoal = GetGoalsScored(currentattack, currentmidfield, 
+                            currentdefense, currentgoalkeeper);
+                        //Idegen csapat góljainak a száma
+                        currentattack = (int)(from x in TEAMs
+                                              where x.ID == j + 1
+                                              select x.ATTACK_LEVEL).First();
+                        currentmidfield = (int)(from x in TEAMs
+                                                where x.ID == j + 1
+                                                select x.MIDFIELD_LEVEL).First();
+                        currentdefense = (int)(from x in TEAMs
+                                               where x.ID == i + 1
+                                               select x.MIDFIELD_LEVEL).First();
+                        currentgoalkeeper = (int)(from x in TEAMs
+                                                  where x.ID ==  + 1
+                                                  select x.MIDFIELD_LEVEL).First();
+                        currentawaygoal = GetGoalsScored(currentattack, currentmidfield,
+                            currentdefense, currentgoalkeeper);
                     }
                 }
             }
         }
 
         //kiszámolja, hogy az adott meccsen az egyik fél hány gól fog rúgni
-        private void GetGoalsScored(int attacklevel, int midfieldlevel, 
+        private int GetGoalsScored(int attacklevel, int midfieldlevel, 
             int enemydefenselevel, int enemygoalkeeperlevel) {
 
             int goalsscored = 0;
@@ -64,6 +99,7 @@ namespace IRF_Project
                     goalsscored = goalsscored + 1;
                 }
             }
+            return goalsscored;
         }
 
 
