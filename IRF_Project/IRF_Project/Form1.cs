@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -180,6 +181,11 @@ namespace IRF_Project
                 leagueResult.totalgoaldifference = (leagueResult.totalgoalsscored) - (leagueResult.totalgoalsget);
                 leagueResults.Add(leagueResult);
             }
+        }
+
+        //Eredmények kiíratása csv fileba
+        private void OutputToCSV() {
+            //StreamWriter sw = new StreamWriter("",Encoding.Default);
         }
     }
 }
