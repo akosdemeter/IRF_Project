@@ -16,6 +16,7 @@ namespace IRF_Project
         IRF_assignmentEntities context = new IRF_assignmentEntities();
         List<TEAM> TEAMs;
         List<GameResult> gameResults = new List<GameResult>();
+        List<LeagueResult> leagueResults = new List<LeagueResult>();
         Random rng = new Random(); //a seed megadása nem biztos, hogy fog kelleni
         int currenthomegoal = 0;
         int currentawaygoal = 0;
@@ -25,26 +26,30 @@ namespace IRF_Project
         int currentgoalkeeper;
         double opportunityprob;
         double goalprob;
+        int numberofteams;
 
         public Form1()
         {
             InitializeComponent();
             LoadData();
+            dataGridView1.DataSource = TEAMs;
             SimulateMatches();
             dataGridView2.DataSource = gameResults;
+            RankTeams();
+            dataGridView3.DataSource = leagueResults; /* (from z in leagueResults 
+                                        select z).OrderByDescending(c => 
+                                        c.totalpoints).OrderByDescending(d => 
+                                        d.totalgoalsscored).OrderByDescending(e => e.totalgoalsget);*/
         }
 
         private void LoadData() {
-            //TEAMs.Clear();
             TEAMs = context.TEAMS.ToList();
-            dataGridView1.DataSource = TEAMs;
-            //gameResults.Clear();
         }
 
         //lejátssza az egyes mérkőzéseket
         private void SimulateMatches() {
 
-            int numberofteams = TEAMs.Count();
+            numberofteams = TEAMs.Count();
             for (int i = 0; i < numberofteams; i++)
             {
                 for (int j = 0; j < numberofteams; j++)
@@ -139,6 +144,40 @@ namespace IRF_Project
                 }
             }
             return points;
+        }
+
+        //Eredmények összesítése
+        private void RankTeams() {
+            for (int n = 0; n < numberofteams; n++)
+            {
+                int allhomepoints = (from y in gameResults 
+                                     where y.HomeTeamID == n + 1 
+                                     select y.HomeTeamPoints).Sum();
+                int allawaypoints = (from y in gameResults
+                                     where y.AwayTeamID == n + 1
+                                     select y.AwayTeamPoints).Sum();
+                int allhomegoals = (from y in gameResults
+                                     where y.HomeTeamID == n + 1
+                                     select y.HomeTeamGoals).Sum();
+                int allawaygoals = (from y in gameResults
+                                     where y.AwayTeamID == n + 1
+                                     select y.AwayTeamGoals).Sum();
+                int allhomegoalsget = (from y in gameResults
+                                       where y.HomeTeamID == n + 1
+                                       select y.AwayTeamGoals).Sum();
+                int allawaygoalsget = (from y in gameResults
+                                       where y.AwayTeamID == n + 1
+                                       select y.HomeTeamGoals).Sum();
+                string teamname = (from y in TEAMs
+                                   where y.ID == n + 1
+                                   select y.NAME).First();
+                LeagueResult leagueResult = new LeagueResult();
+                leagueResult.teamname = teamname;
+                leagueResult.totalpoints = allhomepoints + allawaypoints;
+                leagueResult.totalgoalsscored = allhomegoals + allawaygoals;
+                leagueResult.totalgoalsget = allhomegoalsget + allawaygoalsget;
+                leagueResults.Add(leagueResult);
+            }
         }
     }
 }
