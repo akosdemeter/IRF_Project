@@ -33,7 +33,15 @@ namespace IRF_Project
         {
             InitializeComponent();
             LoadData();
-            dataGridView1.DataSource = TEAMs;
+            dgvTeams.DataSource = (from x in TEAMs
+                                   select new
+                                   {
+                                       Csapatnév = x.NAME,
+                                       Támadók_erőssége = x.ATTACK_LEVEL,
+                                       Középpálya_erőssége = x.MIDFIELD_LEVEL,
+                                       Védelem_erőssége = x.DEFENSE_LEVEL,
+                                       Kapus_erőssége = x.GOALKEEPER_LEVEL
+                                   }).ToList();
         }
 
         private void LoadData() {
@@ -177,14 +185,17 @@ namespace IRF_Project
 
         private void btnSimulation_Click(object sender, EventArgs e)
         {
+            gameResults.Clear();
+            leagueResults.Clear();
             SimulateMatches();
-            dataGridView2.DataSource = gameResults;
             RankTeams();
-            dataGridView3.DataSource = (from z in leagueResults
+            dgvResults.DataSource = (from z in leagueResults
                                         orderby z.totalpoints descending,
                                          z.totalgoaldifference descending,
                                          z.totalgoalsscored descending
-                                        select z).ToList();
+                                        select new {Csapatnév = z.teamname, Pontszám = z.totalpoints,
+                                            Gólkülönbség = z.totalgoaldifference, Rúgott_Gólok_Száma = z.totalgoalsscored,
+                                            Kapott_Gólok_Száma = z.totalgoalsget}).ToList();
         }
 
         //Eredmények kiíratása csv fileba
@@ -229,5 +240,6 @@ namespace IRF_Project
             }
             
         }
+
     }
 }
