@@ -16,27 +16,34 @@ namespace IRF_Project
         IRF_assignmentEntities context = new IRF_assignmentEntities();
         List<TEAM> TEAMs;
         List<GameResult> gameResults = new List<GameResult>();
-        Random rng = new Random(1234); //a seed megadása nem biztos, hogy fog kelleni
+        Random rng = new Random(); //a seed megadása nem biztos, hogy fog kelleni
         int currenthomegoal = 0;
         int currentawaygoal = 0;
         int currentattack;
         int currentmidfield;
         int currentdefense;
         int currentgoalkeeper;
+        double opportunityprob;
+        double goalprob;
 
         public Form1()
         {
             InitializeComponent();
             LoadData();
-            dataGridView1.DataSource = TEAMs;
+            SimulateMatches();
+            dataGridView2.DataSource = gameResults;
         }
 
         private void LoadData() {
+            //TEAMs.Clear();
             TEAMs = context.TEAMS.ToList();
+            dataGridView1.DataSource = TEAMs;
+            //gameResults.Clear();
         }
 
         //lejátssza az egyes mérkőzéseket
         private void SimulateMatches() {
+
             int numberofteams = TEAMs.Count();
             for (int i = 0; i < numberofteams; i++)
             {
@@ -93,17 +100,19 @@ namespace IRF_Project
             int enemydefenselevel, int enemygoalkeeperlevel) {
 
             int goalsscored = 0;
+            opportunityprob = midfieldlevel / (double)(midfieldlevel + enemydefenselevel);
+            goalprob = (double)attacklevel / (double)(attacklevel + enemygoalkeeperlevel);
             int createdoppotunities = 0;
             for (int i = 0; i < 10; i++)
             {
-                if (rng.NextDouble() <= (midfieldlevel / (midfieldlevel + enemydefenselevel)))
+                if (rng.NextDouble() <= opportunityprob)
                 {
                     createdoppotunities = createdoppotunities + 1;
                 }
             }
             for (int i = 0; i < createdoppotunities; i++)
             {
-                if (rng.NextDouble() <= (attacklevel / (attacklevel + enemygoalkeeperlevel)))
+                if (rng.NextDouble() <= goalprob)
                 {
                     goalsscored = goalsscored + 1;
                 }
