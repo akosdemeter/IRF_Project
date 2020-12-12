@@ -189,11 +189,12 @@ namespace IRF_Project
             leagueResults.Clear();
             SimulateMatches();
             RankTeams();
+            int ranking = 1;
             dgvResults.DataSource = (from z in leagueResults
                                         orderby z.totalpoints descending,
                                          z.totalgoaldifference descending,
                                          z.totalgoalsscored descending
-                                        select new {Csapatnév = z.teamname, Pontszám = z.totalpoints,
+                                        select new {Helyezés = ranking++, Csapatnév = z.teamname, Pontszám = z.totalpoints,
                                             Gólkülönbség = z.totalgoaldifference, Rúgott_Gólok_Száma = z.totalgoalsscored,
                                             Kapott_Gólok_Száma = z.totalgoalsget}).ToList();
         }
