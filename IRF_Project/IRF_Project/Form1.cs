@@ -268,7 +268,7 @@ namespace IRF_Project
         }
 
         //-------------------------------------------------------------------
-        //Eredmények kiíratása csv fileba gombnyomásra
+        //Tabellaeredmények kiíratása csv fileba gombnyomásra
         private void btnExport_Click(object sender, EventArgs e)
         {
             if (leagueResults.Count!=0)
@@ -313,6 +313,47 @@ namespace IRF_Project
                     }
                 }
             }    
+        }
+
+        //-------------------------------------------------------------------
+        //Mérkőzéseredmények kiíratása csv fileba gombnyomásra
+        private void btngameexport_Click(object sender, EventArgs e)
+        {
+            if (gameResults.Count != 0)
+            {
+                string hometeam;
+                string awayteam;
+                SaveFileDialog sfd2 = new SaveFileDialog();
+                sfd2.InitialDirectory = Application.StartupPath;
+                sfd2.Filter = "Comma Separated Values (*.csv)|*.csv";
+                sfd2.DefaultExt = "csv";
+                sfd2.AddExtension = true;
+                if (sfd2.ShowDialog() != DialogResult.OK) return;
+                using (StreamWriter sw = new StreamWriter(sfd2.FileName, false, Encoding.UTF8))
+                {
+                    sw.Write("Hazai csapat,Vendég csapat, Hazai csapat góljai, Vendég csapat góljai");
+                    sw.WriteLine();
+                    var listofgames = (from v in gameResults
+                                       select v).ToList();
+                    foreach (var game in listofgames)
+                    {
+                        hometeam = (from z in TEAMs 
+                                    where z.ID == game.HomeTeamID 
+                                    select z.NAME).First();
+                        awayteam = (from z in TEAMs
+                                    where z.ID == game.AwayTeamID
+                                    select z.NAME).First();
+                        sw.Write(hometeam);
+                        sw.Write(",");
+                        sw.Write(awayteam);
+                        sw.Write(",");
+                        sw.Write(game.HomeTeamGoals);
+                        sw.Write(",");
+                        sw.Write(game.AwayTeamGoals);
+                        sw.WriteLine();
+                    }
+                }
+            }
         }
     }
 }
