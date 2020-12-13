@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\GameProbability.cs" />
     <Compile Include="Entities\GameResult.cs" />
     <Compile Include="Entities\LeagueResult.cs" />
     <Compile Include="Form1.cs">

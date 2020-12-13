@@ -18,6 +18,7 @@ namespace IRF_Project
         List<TEAM> TEAMs;
         List<GameResult> gameResults = new List<GameResult>();
         List<LeagueResult> leagueResults = new List<LeagueResult>();
+        List<GameProbability> gameProbabilities = new List<GameProbability>();
         Random rng = new Random();
         int currenthomegoal = 0;
         int currentawaygoal = 0;
@@ -25,8 +26,6 @@ namespace IRF_Project
         int currentmidfield;
         int currentenemydefense;
         int currentenemygoalkeeper;
-        double opportunityprob;
-        double goalprob;
         int numberofteams;
 
         public Form1()
@@ -71,8 +70,14 @@ namespace IRF_Project
                         currentenemygoalkeeper = (int)(from x in TEAMs
                                                 where x.ID == j + 1
                                                 select x.MIDFIELD_LEVEL).First();
-                        currenthomegoal = GetGoalsScored(currentattack, currentmidfield, 
-                            currentenemydefense, currentenemygoalkeeper);
+                        GameProbability gameProbability = new GameProbability();
+                        gameProbability.hometeamid = i + 1;
+                        gameProbability.hometeamopportunityprob = (double)currentmidfield /
+                                                                (double)(currentmidfield + currentenemydefense);
+                        gameProbability.hometeamgoalprob = (double)currentattack /
+                                                        (double)(currentattack + currentenemygoalkeeper);
+                        currenthomegoal = GetGoalsScored(gameProbability.hometeamopportunityprob, 
+                                          gameProbability.hometeamgoalprob);
                         //Idegen csapat góljainak a száma
                         currentattack = (int)(from x in TEAMs
                                               where x.ID == j + 1
@@ -86,8 +91,14 @@ namespace IRF_Project
                         currentenemygoalkeeper = (int)(from x in TEAMs
                                                   where x.ID ==  + 1
                                                   select x.MIDFIELD_LEVEL).First();
-                        currentawaygoal = GetGoalsScored(currentattack, currentmidfield,
-                            currentenemydefense, currentenemygoalkeeper);
+                        gameProbability.awayteamid = j + 1;
+                        gameProbability.awayteamopportunity = (double)currentmidfield /
+                                                                (double)(currentmidfield + currentenemydefense);
+                        gameProbability.awayteamgoalprob = (double)currentattack /
+                                                        (double)(currentattack + currentenemygoalkeeper);
+                        currentawaygoal = GetGoalsScored(gameProbability.awayteamopportunity,
+                                          gameProbability.awayteamgoalprob);
+                        gameProbabilities.Add(gameProbability);
                         //Mérkőzések rögzítése
                         GameResult gameResult = new GameResult();
                         gameResult.HomeTeamID = i + 1;
@@ -103,12 +114,9 @@ namespace IRF_Project
         }
 
         //kiszámolja, hogy az adott meccsen az egyik fél hány gól fog rúgni
-        private int GetGoalsScored(int attacklevel, int midfieldlevel, 
-            int enemydefenselevel, int enemygoalkeeperlevel) {
+        private int GetGoalsScored(double opportunityprob, double goalprob) {
 
             int goalsscored = 0;
-            opportunityprob = midfieldlevel / (double)(midfieldlevel + enemydefenselevel);
-            goalprob = (double)attacklevel / (double)(attacklevel + enemygoalkeeperlevel);
             int createdoppotunities = 0;
             for (int i = 0; i < 10; i++)
             {
