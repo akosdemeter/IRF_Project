@@ -22,7 +22,7 @@ namespace IRF_Project
         Random rng = new Random();
         int numberofteams;
 
-        //-------------------------------------------------------------------
+        //--------------------------------------------------------------------
         //Konstruktor
         public Form1()
         {
