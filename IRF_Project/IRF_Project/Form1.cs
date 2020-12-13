@@ -57,9 +57,6 @@ namespace IRF_Project
             int currentenemydefense;
             int currentenemygoalkeeper;
 
-            CreateMatches();
-            RandomizeMatchOrder();
-            //A mérkőzések lejátszása
             var gamestobeplayed = (from y in gameResults
                                    select y).ToList();
             int counter = 0;
@@ -277,6 +274,8 @@ namespace IRF_Project
             gameProbabilities.Clear();
             gameResults.Clear();
             leagueResults.Clear();
+            CreateMatches();
+            RandomizeMatchOrder();
             SimulateMatches();
             RankTeams();
             int ranking = 1;
