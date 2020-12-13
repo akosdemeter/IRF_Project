@@ -23,6 +23,7 @@ namespace IRF_Project
         int numberofteams;
 
         //-------------------------------------------------------------------
+        //Konstruktor
         public Form1()
         {
             InitializeComponent();
@@ -39,7 +40,7 @@ namespace IRF_Project
         }
 
         //-------------------------------------------------------------------
-        //Betöltés adatbázisból a listába és csapatokszámának megállapítása
+        //Betöltés adatbázisból a listába és csapatok számának megállapítása
         private void LoadData() {
             TEAMs = context.TEAMS.ToList();
             numberofteams = TEAMs.Count();
@@ -47,42 +48,19 @@ namespace IRF_Project
 
         //-------------------------------------------------------------------
         //lejátssza az egyes mérkőzéseket
-        private void SimulateMatches() {
+        private void SimulateMatches()
+        {
             int currenthomegoal;
             int currentawaygoal;
             int currentattack;
             int currentmidfield;
             int currentenemydefense;
             int currentenemygoalkeeper;
-            //Lejátszandó mérkőzések rögzítése
-            for (int i = 0; i < numberofteams; i++)
-            {
-                for (int j = 0; j < numberofteams; j++)
-                {
-                    if (i != j)
-                    {
-                        GameResult gameResult = new GameResult();
-                        gameResult.HomeTeamID = i + 1;
-                        gameResult.AwayTeamID = j + 1;
-                        gameResult.HomeTeamGoals = 0;
-                        gameResult.AwayTeamGoals = 0;
-                        gameResult.HomeTeamPoints = 0;
-                        gameResult.AwayTeamPoints = 0;
-                        gameResults.Add(gameResult);
-                    }
-                }
-            }
-            //Mérkőzések sorrendjének összekeverése
-            int numberofmatches = gameResults.Count;
-            for (int i = 0; i < numberofmatches; i++)
-            {
-                var r = rng.Next(numberofmatches);
-                var tmp = gameResults[i];
-                gameResults[i] = gameResults[r];
-                gameResults[r] = tmp;
-            }
+
+            CreateMatches();
+            RandomizeMatchOrder();
             //A mérkőzések lejátszása
-            var gamestobeplayed = (from y in gameResults 
+            var gamestobeplayed = (from y in gameResults
                                    select y).ToList();
             int counter = 0;
             foreach (var game in gamestobeplayed)
@@ -135,6 +113,39 @@ namespace IRF_Project
                 gameResults[counter].HomeTeamPoints = GetPointsEarned(currenthomegoal, currentawaygoal);
                 gameResults[counter].AwayTeamPoints = GetPointsEarned(currentawaygoal, currenthomegoal);
                 counter++;
+            }
+        }
+
+        //-------------------------------------------------------------------
+        //Mérkőzések sorrendjének összekeverése
+        private void RandomizeMatchOrder()
+        {
+            int numberofmatches = gameResults.Count;
+            for (int i = 0; i < numberofmatches; i++)
+            {
+                var r = rng.Next(numberofmatches);
+                var tmp = gameResults[i];
+                gameResults[i] = gameResults[r];
+                gameResults[r] = tmp;
+            }
+        }
+
+        //-------------------------------------------------------------------
+        //Lejátszandó mérkőzések rögzítése
+        private void CreateMatches()
+        {
+            for (int i = 0; i < numberofteams; i++)
+            {
+                for (int j = 0; j < numberofteams; j++)
+                {
+                    if (i != j)
+                    {
+                        GameResult gameResult = new GameResult();
+                        gameResult.HomeTeamID = i + 1;
+                        gameResult.AwayTeamID = j + 1;
+                        gameResults.Add(gameResult);
+                    }
+                }
             }
         }
 
@@ -201,22 +212,22 @@ namespace IRF_Project
 
             for (int n = 0; n < numberofteams; n++)
             {
-                allhomepoints = (from y in gameResults 
+                allhomepoints = (int)(from y in gameResults 
                                      where y.HomeTeamID == n + 1 
                                      select y.HomeTeamPoints).Sum();
-                allawaypoints = (from y in gameResults
+                allawaypoints = (int)(from y in gameResults
                                      where y.AwayTeamID == n + 1
                                      select y.AwayTeamPoints).Sum();
-                allhomegoals = (from y in gameResults
+                allhomegoals = (int)(from y in gameResults
                                      where y.HomeTeamID == n + 1
                                      select y.HomeTeamGoals).Sum();
-                allawaygoals = (from y in gameResults
+                allawaygoals = (int)(from y in gameResults
                                      where y.AwayTeamID == n + 1
                                      select y.AwayTeamGoals).Sum();
-                allhomegoalsget = (from y in gameResults
+                allhomegoalsget = (int)(from y in gameResults
                                        where y.HomeTeamID == n + 1
                                        select y.AwayTeamGoals).Sum();
-                allawaygoalsget = (from y in gameResults
+                allawaygoalsget = (int)(from y in gameResults
                                        where y.AwayTeamID == n + 1
                                        select y.HomeTeamGoals).Sum();
                 allhomewins = (from y in gameResults

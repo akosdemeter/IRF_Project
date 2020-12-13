@@ -10,9 +10,9 @@ namespace IRF_Project.Entities
     {
         public int HomeTeamID { get; set; }
         public int AwayTeamID { get; set; }
-        public int HomeTeamGoals { get; set; }
-        public int AwayTeamGoals { get; set; }
-        public int HomeTeamPoints { get; set; }
-        public int AwayTeamPoints { get; set; }
+        public int? HomeTeamGoals { get; set; }
+        public int? AwayTeamGoals { get; set; }
+        public int? HomeTeamPoints { get; set; }
+        public int? AwayTeamPoints { get; set; }
     }
 }
