@@ -23,8 +23,8 @@ namespace IRF_Project
         int currentawaygoal = 0;
         int currentattack;
         int currentmidfield;
-        int currentdefense;
-        int currentgoalkeeper;
+        int currentenemydefense;
+        int currentenemygoalkeeper;
         double opportunityprob;
         double goalprob;
         int numberofteams;
@@ -65,14 +65,14 @@ namespace IRF_Project
                         currentmidfield = (int)(from x in TEAMs
                                                 where x.ID == i + 1
                                                 select x.MIDFIELD_LEVEL).First();
-                        currentdefense = (int)(from x in TEAMs
+                        currentenemydefense = (int)(from x in TEAMs
                                                 where x.ID == j + 1
                                                 select x.MIDFIELD_LEVEL).First();
-                        currentgoalkeeper = (int)(from x in TEAMs
+                        currentenemygoalkeeper = (int)(from x in TEAMs
                                                 where x.ID == j + 1
                                                 select x.MIDFIELD_LEVEL).First();
                         currenthomegoal = GetGoalsScored(currentattack, currentmidfield, 
-                            currentdefense, currentgoalkeeper);
+                            currentenemydefense, currentenemygoalkeeper);
                         //Idegen csapat góljainak a száma
                         currentattack = (int)(from x in TEAMs
                                               where x.ID == j + 1
@@ -80,14 +80,14 @@ namespace IRF_Project
                         currentmidfield = (int)(from x in TEAMs
                                                 where x.ID == j + 1
                                                 select x.MIDFIELD_LEVEL).First();
-                        currentdefense = (int)(from x in TEAMs
+                        currentenemydefense = (int)(from x in TEAMs
                                                where x.ID == i + 1
                                                select x.MIDFIELD_LEVEL).First();
-                        currentgoalkeeper = (int)(from x in TEAMs
+                        currentenemygoalkeeper = (int)(from x in TEAMs
                                                   where x.ID ==  + 1
                                                   select x.MIDFIELD_LEVEL).First();
                         currentawaygoal = GetGoalsScored(currentattack, currentmidfield,
-                            currentdefense, currentgoalkeeper);
+                            currentenemydefense, currentenemygoalkeeper);
                         //Mérkőzések rögzítése
                         GameResult gameResult = new GameResult();
                         gameResult.HomeTeamID = i + 1;
@@ -183,6 +183,7 @@ namespace IRF_Project
             }
         }
 
+        //Szimuláció indítása
         private void btnSimulation_Click(object sender, EventArgs e)
         {
             gameResults.Clear();
