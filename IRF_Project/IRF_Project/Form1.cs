@@ -54,68 +54,87 @@ namespace IRF_Project
             int currentmidfield;
             int currentenemydefense;
             int currentenemygoalkeeper;
-
+            //Lejátszandó mérkőzések rögzítése
             for (int i = 0; i < numberofteams; i++)
             {
                 for (int j = 0; j < numberofteams; j++)
                 {
-                    if (i!=j)
+                    if (i != j)
                     {
-                        //Hazai csapat góljainak a száma
-                        currentattack = (int)(from x in TEAMs 
-                                              where x.ID == i + 1 
-                                              select x.ATTACK_LEVEL).First();
-                        currentmidfield = (int)(from x in TEAMs
-                                                where x.ID == i + 1
-                                                select x.MIDFIELD_LEVEL).First();
-                        currentenemydefense = (int)(from x in TEAMs
-                                                where x.ID == j + 1
-                                                select x.MIDFIELD_LEVEL).First();
-                        currentenemygoalkeeper = (int)(from x in TEAMs
-                                                where x.ID == j + 1
-                                                select x.MIDFIELD_LEVEL).First();
-                        GameProbability gameProbability = new GameProbability();
-                        gameProbability.hometeamid = i + 1;
-                        gameProbability.hometeamopportunityprob = (double)currentmidfield /
-                                                                (double)(currentmidfield + currentenemydefense);
-                        gameProbability.hometeamgoalprob = (double)currentattack /
-                                                        (double)(currentattack + currentenemygoalkeeper);
-                        currenthomegoal = GetGoalsScored(gameProbability.hometeamopportunityprob, 
-                                          gameProbability.hometeamgoalprob);
-                        
-                        //Idegen csapat góljainak a száma
-                        currentattack = (int)(from x in TEAMs
-                                              where x.ID == j + 1
-                                              select x.ATTACK_LEVEL).First();
-                        currentmidfield = (int)(from x in TEAMs
-                                                where x.ID == j + 1
-                                                select x.MIDFIELD_LEVEL).First();
-                        currentenemydefense = (int)(from x in TEAMs
-                                               where x.ID == i + 1
-                                               select x.MIDFIELD_LEVEL).First();
-                        currentenemygoalkeeper = (int)(from x in TEAMs
-                                                  where x.ID ==  + 1
-                                                  select x.MIDFIELD_LEVEL).First();
-                        gameProbability.awayteamid = j + 1;
-                        gameProbability.awayteamopportunity = (double)currentmidfield /
-                                                                (double)(currentmidfield + currentenemydefense);
-                        gameProbability.awayteamgoalprob = (double)currentattack /
-                                                        (double)(currentattack + currentenemygoalkeeper);
-                        currentawaygoal = GetGoalsScored(gameProbability.awayteamopportunity,
-                                          gameProbability.awayteamgoalprob);
-                        gameProbabilities.Add(gameProbability);
-                        
-                        //Mérkőzések rögzítése
                         GameResult gameResult = new GameResult();
                         gameResult.HomeTeamID = i + 1;
                         gameResult.AwayTeamID = j + 1;
-                        gameResult.HomeTeamGoals = currenthomegoal;
-                        gameResult.AwayTeamGoals = currentawaygoal;
-                        gameResult.HomeTeamPoints = GetPointsEarned(currenthomegoal, currentawaygoal);
-                        gameResult.AwayTeamPoints = GetPointsEarned(currentawaygoal, currenthomegoal);
+                        gameResult.HomeTeamGoals = 0;
+                        gameResult.AwayTeamGoals = 0;
+                        gameResult.HomeTeamPoints = 0;
+                        gameResult.AwayTeamPoints = 0;
                         gameResults.Add(gameResult);
                     }
                 }
+            }
+            //Mérkőzések sorrendjének összekeverése
+            int numberofmatches = gameResults.Count;
+            for (int i = 0; i < numberofmatches; i++)
+            {
+                var r = rng.Next(numberofmatches);
+                var tmp = gameResults[i];
+                gameResults[i] = gameResults[r];
+                gameResults[r] = tmp;
+            }
+            //A mérkőzések lejátszása
+            var gamestobeplayed = (from y in gameResults 
+                                   select y).ToList();
+            int counter = 0;
+            foreach (var game in gamestobeplayed)
+            {
+                //Hazai csapat góljainak a száma
+                currentattack = (int)(from x in TEAMs
+                                      where x.ID == game.HomeTeamID
+                                      select x.ATTACK_LEVEL).First();
+                currentmidfield = (int)(from x in TEAMs
+                                        where x.ID == game.HomeTeamID
+                                        select x.MIDFIELD_LEVEL).First();
+                currentenemydefense = (int)(from x in TEAMs
+                                            where x.ID == game.AwayTeamID
+                                            select x.MIDFIELD_LEVEL).First();
+                currentenemygoalkeeper = (int)(from x in TEAMs
+                                               where x.ID == game.AwayTeamID
+                                               select x.MIDFIELD_LEVEL).First();
+                GameProbability gameProbability = new GameProbability();
+                gameProbability.hometeamid = game.HomeTeamID;
+                gameProbability.hometeamopportunityprob = (double)currentmidfield /
+                                                        (double)(currentmidfield + currentenemydefense);
+                gameProbability.hometeamgoalprob = (double)currentattack /
+                                                (double)(currentattack + currentenemygoalkeeper);
+                currenthomegoal = GetGoalsScored(gameProbability.hometeamopportunityprob,
+                                  gameProbability.hometeamgoalprob);
+                //Idegen csapat góljainak a száma
+                currentattack = (int)(from x in TEAMs
+                                      where x.ID == game.AwayTeamID
+                                      select x.ATTACK_LEVEL).First();
+                currentmidfield = (int)(from x in TEAMs
+                                        where x.ID == game.AwayTeamID
+                                        select x.MIDFIELD_LEVEL).First();
+                currentenemydefense = (int)(from x in TEAMs
+                                            where x.ID == game.HomeTeamID
+                                            select x.MIDFIELD_LEVEL).First();
+                currentenemygoalkeeper = (int)(from x in TEAMs
+                                               where x.ID == game.HomeTeamID
+                                               select x.MIDFIELD_LEVEL).First();
+                gameProbability.awayteamid = game.AwayTeamID;
+                gameProbability.awayteamopportunity = (double)currentmidfield /
+                                                        (double)(currentmidfield + currentenemydefense);
+                gameProbability.awayteamgoalprob = (double)currentattack /
+                                                (double)(currentattack + currentenemygoalkeeper);
+                currentawaygoal = GetGoalsScored(gameProbability.awayteamopportunity,
+                                  gameProbability.awayteamgoalprob);
+                gameProbabilities.Add(gameProbability);
+                //Mérkőzés eredményének frissítése
+                gameResults[counter].HomeTeamGoals = currenthomegoal;
+                gameResults[counter].AwayTeamGoals = currentawaygoal;
+                gameResults[counter].HomeTeamPoints = GetPointsEarned(currenthomegoal, currentawaygoal);
+                gameResults[counter].AwayTeamPoints = GetPointsEarned(currentawaygoal, currenthomegoal);
+                counter++;
             }
         }
 
@@ -128,14 +147,14 @@ namespace IRF_Project
             {
                 if (rng.NextDouble() <= opportunityprob)
                 {
-                    createdoppotunities = createdoppotunities + 1;
+                    createdoppotunities++;
                 }
             }
             for (int i = 0; i < createdoppotunities; i++)
             {
                 if (rng.NextDouble() <= goalprob)
                 {
-                    goalsscored = goalsscored + 1;
+                    goalsscored++;
                 }
             }
             return goalsscored;
@@ -309,7 +328,7 @@ namespace IRF_Project
                         sw.Write(",");
                         sw.Write(row.totallosses);
                         sw.WriteLine();
-                        rank = rank + 1;
+                        rank++;
                     }
                 }
             }    
