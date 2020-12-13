@@ -20,8 +20,8 @@ namespace IRF_Project
         List<LeagueResult> leagueResults = new List<LeagueResult>();
         List<GameProbability> gameProbabilities = new List<GameProbability>();
         Random rng = new Random();
-        int currenthomegoal = 0;
-        int currentawaygoal = 0;
+        int currenthomegoal;
+        int currentawaygoal;
         int currentattack;
         int currentmidfield;
         int currentenemydefense;
@@ -78,6 +78,7 @@ namespace IRF_Project
                                                         (double)(currentattack + currentenemygoalkeeper);
                         currenthomegoal = GetGoalsScored(gameProbability.hometeamopportunityprob, 
                                           gameProbability.hometeamgoalprob);
+                        
                         //Idegen csapat góljainak a száma
                         currentattack = (int)(from x in TEAMs
                                               where x.ID == j + 1
@@ -99,6 +100,7 @@ namespace IRF_Project
                         currentawaygoal = GetGoalsScored(gameProbability.awayteamopportunity,
                                           gameProbability.awayteamgoalprob);
                         gameProbabilities.Add(gameProbability);
+                        
                         //Mérkőzések rögzítése
                         GameResult gameResult = new GameResult();
                         gameResult.HomeTeamID = i + 1;
@@ -113,7 +115,7 @@ namespace IRF_Project
             }
         }
 
-        //kiszámolja, hogy az adott meccsen az egyik fél hány gól fog rúgni
+        //kiszámolja, hogy az adott meccsen az egyik fél hány gólt fog rúgni
         private int GetGoalsScored(double opportunityprob, double goalprob) {
 
             int goalsscored = 0;
@@ -178,6 +180,30 @@ namespace IRF_Project
                 int allawaygoalsget = (from y in gameResults
                                        where y.AwayTeamID == n + 1
                                        select y.HomeTeamGoals).Sum();
+                int allhomewins = (from y in gameResults
+                                   where y.HomeTeamID == n + 1
+                                   && y.HomeTeamPoints == 3
+                                   select y).Count();
+                int allhomedraws = (from y in gameResults
+                                    where y.HomeTeamID == n + 1
+                                    && y.HomeTeamPoints == 1
+                                    select y).Count();
+                int allhomelosses = (from y in gameResults
+                                     where y.HomeTeamID == n + 1
+                                     && y.HomeTeamPoints == 0
+                                     select y).Count();
+                int allawaywins = (from y in gameResults
+                                   where y.AwayTeamID == n + 1
+                                   && y.AwayTeamPoints == 3
+                                   select y).Count();
+                int allawaydraws = (from y in gameResults
+                                    where y.AwayTeamID == n + 1
+                                    && y.AwayTeamPoints == 1
+                                    select y).Count();
+                int allawaylosses = (from y in gameResults
+                                     where y.AwayTeamID == n + 1
+                                     && y.AwayTeamPoints == 0
+                                     select y).Count();
                 string teamname = (from y in TEAMs
                                    where y.ID == n + 1
                                    select y.NAME).First();
@@ -186,12 +212,15 @@ namespace IRF_Project
                 leagueResult.totalpoints = allhomepoints + allawaypoints;
                 leagueResult.totalgoalsscored = allhomegoals + allawaygoals;
                 leagueResult.totalgoalsget = allhomegoalsget + allawaygoalsget;
-                leagueResult.totalgoaldifference = (leagueResult.totalgoalsscored) - (leagueResult.totalgoalsget);
+                leagueResult.totalgoaldifference = leagueResult.totalgoalsscored - leagueResult.totalgoalsget;
+                leagueResult.totalwins = allhomewins + allawaywins;
+                leagueResult.totaldraws = allhomedraws + allawaydraws;
+                leagueResult.totallosses = allhomelosses + allawaylosses;
                 leagueResults.Add(leagueResult);
             }
         }
 
-        //Szimuláció indítása
+        //Szimuláció végrehajtása gombnyomásra
         private void btnSimulation_Click(object sender, EventArgs e)
         {
             gameResults.Clear();
@@ -203,12 +232,20 @@ namespace IRF_Project
                                         orderby z.totalpoints descending,
                                          z.totalgoaldifference descending,
                                          z.totalgoalsscored descending
-                                        select new {Helyezés = ranking++, Csapatnév = z.teamname, Pontszám = z.totalpoints,
-                                            Gólkülönbség = z.totalgoaldifference, Rúgott_Gólok_Száma = z.totalgoalsscored,
-                                            Kapott_Gólok_Száma = z.totalgoalsget}).ToList();
+                                        select new {
+                                            Helyezés = ranking++, 
+                                            Csapatnév = z.teamname, 
+                                            Pontszám = z.totalpoints,
+                                            Gólkülönbség = z.totalgoaldifference, 
+                                            Rúgott_Gólok_Száma = z.totalgoalsscored,
+                                            Kapott_Gólok_Száma = z.totalgoalsget,
+                                            Győzelmek = z.totalwins,
+                                            Döntetlenek = z.totaldraws,
+                                            Vereségek = z.totallosses
+                                        }).ToList();
         }
 
-        //Eredmények kiíratása csv fileba
+        //Eredmények kiíratása csv fileba gombnyomásra
         private void btnExport_Click(object sender, EventArgs e)
         {
             if (leagueResults.Count!=0)
@@ -222,7 +259,7 @@ namespace IRF_Project
                 using (StreamWriter sw = new StreamWriter(sfd.FileName, false, Encoding.UTF8))
                 {
                     int rank = 1;
-                    sw.Write("Helyezés,Csapatnév,Pontszám,Gólkülönbség,Rúgott gólok száma,Kapott gólok száma");
+                    sw.Write("Helyezés,Csapatnév,Pontszám,Gólkülönbség,Rúgott gólok száma,Kapott gólok száma,Győzelmek,Döntetlenek,Vereségek");
                     sw.WriteLine();
                     var orderedResults = (from z in leagueResults
                                           orderby z.totalpoints descending,
@@ -243,6 +280,11 @@ namespace IRF_Project
                         sw.Write(",");
                         sw.Write(row.totalgoalsget);
                         sw.Write(",");
+                        sw.Write(row.totalwins);
+                        sw.Write(",");
+                        sw.Write(row.totaldraws);
+                        sw.Write(",");
+                        sw.Write(row.totallosses);
                         sw.WriteLine();
                         rank = rank + 1;
                     }

@@ -13,5 +13,8 @@ namespace IRF_Project.Entities
         public int totalgoaldifference { get; set; }
         public int totalgoalsscored { get; set; }
         public int totalgoalsget { get; set; }
+        public int totalwins { get; set; }
+        public int totaldraws { get; set; }
+        public int totallosses {get; set;}
     }
 }
